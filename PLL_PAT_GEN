@@ -1,0 +1,1063 @@
+classdef PLL_PAT_GEN < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure                        matlab.ui.Figure
+        Menu                            matlab.ui.container.Menu
+        Menu2                           matlab.ui.container.Menu
+        TabGroup                        matlab.ui.container.TabGroup
+        ConfigurePinsTab                matlab.ui.container.Tab
+        FINDSETTINGSButton              matlab.ui.control.Button
+        outputEditFieldLabel            matlab.ui.control.Label
+        outputEditField                 matlab.ui.control.NumericEditField
+        clkEditFieldLabel               matlab.ui.control.Label
+        clkEditField                    matlab.ui.control.NumericEditField
+        ToExcelButton                   matlab.ui.control.Button
+        UIAxes                          matlab.ui.control.UIAxes
+        UIAxes2                         matlab.ui.control.UIAxes
+        MHzLabel                        matlab.ui.control.Label
+        MHzLabel_2                      matlab.ui.control.Label
+        SelectPinNamesTab               matlab.ui.container.Tab
+        GeneratePatternFileButton       matlab.ui.control.Button
+        PLL_ENCheckBox                  matlab.ui.control.CheckBox
+        BG_ENCheckBox                   matlab.ui.control.CheckBox
+        PLL_PFD_DELAY_PROGCheckBox      matlab.ui.control.CheckBox
+        PLL_INP_DIVCheckBox             matlab.ui.control.CheckBox
+        CURR_TYPE_SELCheckBox           matlab.ui.control.CheckBox
+        BG_CURR_PROGCheckBox            matlab.ui.control.CheckBox
+        PLL_INP_DIV_SELCheckBox         matlab.ui.control.CheckBox
+        PLL_OUT_DIV_SELCheckBox         matlab.ui.control.CheckBox
+        PLL_FB_DIVCheckBox              matlab.ui.control.CheckBox
+        PLL_VCO_NDAC_PROGCheckBox       matlab.ui.control.CheckBox
+        PLL_VCO_PDAC_PROGCheckBox       matlab.ui.control.CheckBox
+        PLL_VCO_NDAC_ENCheckBox         matlab.ui.control.CheckBox
+        PLL_CP_CURR_PROGCheckBox        matlab.ui.control.CheckBox
+        Select_allCheckBox              matlab.ui.control.CheckBox
+        REF_CLK_DIV_SELCheckBox         matlab.ui.control.CheckBox
+        PLL_EN1CheckBox                 matlab.ui.control.CheckBox
+        PinConfigurationsPanel          matlab.ui.container.Panel
+        PLL_CP_CURR_PROG40Label         matlab.ui.control.Label
+        PLL_VCO_PDAC_PROG50Label        matlab.ui.control.Label
+        PLL_FB_DIV110Label              matlab.ui.control.Label
+        PLL_VCO_NDAC_PROG40Label        matlab.ui.control.Label
+        PLL_VCO_NDAC_ENLabel            matlab.ui.control.Label
+        PLL_OUT_DIV_SEL10Label          matlab.ui.control.Label
+        PLL_INP_DIV_SEL10Label          matlab.ui.control.Label
+        BG_CURR_PROG10Label             matlab.ui.control.Label
+        CURR_TYPE_SELLabel              matlab.ui.control.Label
+        PLL_INP_DIV60Label              matlab.ui.control.Label
+        PLL_PFD_DELAY_PROG10Label       matlab.ui.control.Label
+        BG_ENLabel                      matlab.ui.control.Label
+        PLL_ENLabel                     matlab.ui.control.Label
+        PLL_EN1Label                    matlab.ui.control.Label
+        REF_CLK_DIV_SEL10DropDownLabel  matlab.ui.control.Label
+        REF_CLK_DIV_SEL10DropDown       matlab.ui.control.DropDown
+        Select_TesterDropDownLabel      matlab.ui.control.Label
+        Select_TesterDropDown           matlab.ui.control.DropDown
+        aLabel                          matlab.ui.control.Label
+        bLabel                          matlab.ui.control.Label
+        cLabel                          matlab.ui.control.Label
+        dLabel                          matlab.ui.control.Label
+        eLabel                          matlab.ui.control.Label
+        fLabel                          matlab.ui.control.Label
+        gLabel                          matlab.ui.control.Label
+        hLabel                          matlab.ui.control.Label
+        iLabel                          matlab.ui.control.Label
+        jLabel                          matlab.ui.control.Label
+        kLabel                          matlab.ui.control.Label
+        lLabel                          matlab.ui.control.Label
+        oLabel                          matlab.ui.control.Label
+        nLabel                          matlab.ui.control.Label
+        mLabel                          matlab.ui.control.Label
+    end
+
+    
+    properties (Access = private)
+        %         Property2 % Description
+    end
+    
+    properties (Access = public)
+        myValue % Description
+    end
+    
+    methods (Access = private)
+        %         myValue;
+    end
+    
+    
+
+    methods (Access = private)
+
+        % Code that executes after component creation
+        function startupFcn(app)
+            %                myValue;
+        end
+
+        % Button pushed function: FINDSETTINGSButton
+        function FINDSETTINGSButtonPushed(app, event)
+           
+            output = double(app.outputEditField.Value);
+            clk = double(app.clkEditField.Value);
+            
+            fs=1e8;
+            duration=1e-6;
+            t=0:1/fs:duration;
+            y=square(2*pi*clk*1e6*t);
+            plot(app.UIAxes,t,y);
+
+%             t1=0:1/fs:duration;
+            fs1=1e10;
+            duration1=1e-8;
+            t1=0:1/fs1:duration1;
+            z=square(2*pi*output*1e6*t1);
+            plot(app.UIAxes2,t1,z);
+            
+            
+            app.lLabel.Text = dec2bin(1, 1); % h = 1
+            app.mLabel.Text = dec2bin(1, 1); % h = 1
+            app.hLabel.Text = dec2bin(1, 2); % h = 1
+            app.iLabel.Text = "0";            % i = 0
+            app.kLabel.Text = dec2bin(0, 2);  % k = 0
+            if clk <= 3
+                g = clk;
+                app.gLabel.Text = dec2bin(clk, 2);
+                j = "0000000";
+                app.jLabel.Text = j;
+            else
+                g = 3;
+                app.gLabel.Text = dec2bin(3, 2);
+                j = clk;
+                app.jLabel.Text = dec2bin(j, 7);
+            end
+            app.eLabel.Text = dec2bin(0,1);;
+            app.dLabel.Text = dec2bin(0,5);;
+            app.fLabel.Text = dec2bin(0,2);
+            c = dec2bin(output, 12);
+            app.cLabel.Text = c;
+            app.oLabel.Text = dec2bin(0,1);
+            thresholds = [320, 362, 412, 462, 513, 562, 612, 638, 662, 688, 713, 738, 762, 813, 838, 863, 888, 913, 938, 962, 1013, 1038, 1062, 1088, 1113, 1138, 1163, 1200];
+            % th1 = thresholds/2;
+            % th2 = thresholds/4;
+            % th3 = thresholds/8;
+            bValues = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38];
+            aValues = [5, 5, 5, 5, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 10, 10, 10, 10, 10, 10];
+            nValues = [3, 2, 2, 2, 1, 1, 0, zeros(1, 21)];
+            outputs = [1200:-25:350, 320];  % 1200 to 350 decrementing by 25, then 320
+            op1 = outputs/2;
+            op2 = outputs/4;
+            op3 = outputs/8;
+            if output > 319 && output <= 1200
+                for i = 1:length(thresholds)
+                    if output <= thresholds(i)
+                        app.bLabel.Text = dec2bin(bValues(i), 6);
+                        app.aLabel.Text = dec2bin(aValues(i), 5);
+                        app.dLabel.Text = dec2bin(nValues(i), 5);
+                        if output <= 562
+                            e = 1;
+                            app.eLabel.Text = dec2bin(e);
+                        end
+                        break;
+                    end
+                end
+            end
+            if output > 1 && output <= 300
+                
+                % Calculate minimum differences for each array
+                [diff1, idx1] = min(abs(op1 - output));
+                [diff2, idx2] = min(abs(op2 - output));
+                [diff3, idx3] = min(abs(op3 - output));
+                [diff4, idx4] = min(abs(outputs - output));
+                
+                % Find which array has the overall minimum difference
+                [~, arrayNum] = min([diff1, diff2, diff3, diff4]);
+                
+                % Return the corresponding index
+                indices = [idx1, idx2, idx3, idx4];
+                bestIdx = indices(arrayNum);
+                arrayNames = {'op1', 'op2', 'op3', 'outputs'};
+                bestArray = arrayNames{arrayNum}; % This tells you from which array bestIdx came
+                
+                % for i = 1:length(thresholds)
+                % if output <= th3(i)
+                %     app.bLabel.Text = dec2bin(bValues(i), 6);
+                %     app.aLabel.Text = dec2bin(aValues(i), 5);
+                %     app.dLabel.Text = dec2bin(nValues(i), 5);
+                %     app.fLabel.Text = dec2bin(3, 2);
+                %
+                %     if output <= 562/8
+                %         e = 1;
+                %         app.eLabel.Text = dec2bin(e);
+                %     end
+                %
+                %     break;
+                % end
+                % if output <= th2(i)
+                %     app.bLabel.Text = dec2bin(bValues(i), 6);
+                %     app.aLabel.Text = dec2bin(aValues(i), 5);
+                %     app.dLabel.Text = dec2bin(nValues(i), 5);
+                %     app.fLabel.Text = dec2bin(2, 2);
+                %     if output <= 562/4
+                %         e = 1;
+                %         app.eLabel.Text = dec2bin(e);
+                %     end
+                %
+                %     break;
+                % end
+                % if output <= th1(i)
+                %     app.bLabel.Text = dec2bin(bValues(i), 6);
+                %     app.aLabel.Text = dec2bin(aValues(i), 5);
+                %     app.dLabel.Text = dec2bin(nValues(i), 5);
+                %     app.fLabel.Text = dec2bin(1, 2);
+                %     if output <= 562/2
+                %         e = 1;
+                %         app.eLabel.Text = dec2bin(e);
+                %     end
+                %
+                %     break;
+                % end
+                % app.bLabel.Text = dec2bin(bValues(bestIdx), 6);
+                % app.aLabel.Text = dec2bin(aValues(bestIdx), 5);
+                % app.dLabel.Text = dec2bin(nValues(bestIdx), 5);
+                % app.fLabel.Text = dec2bin(1, 2);
+                % if output(bestIdx) <= 562
+                %     e = 1;
+                %     app.eLabel.Text = dec2bin(e);
+                % end
+                if outputs(bestIdx) > 319 && outputs(bestIdx) <= 1200
+                    for i = 1:length(thresholds)
+                        if outputs(bestIdx) <= thresholds(i)
+                            app.bLabel.Text = dec2bin(bValues(i), 6);
+                            app.aLabel.Text = dec2bin(aValues(i), 5);
+                            app.dLabel.Text = dec2bin(nValues(i), 5);
+                            if outputs(bestIdx) <= 562
+                                e = 1;
+                                app.eLabel.Text = dec2bin(e);
+                            end
+                            break;
+                        end
+                    end
+                end
+                app.cLabel.Text = dec2bin(outputs(bestIdx),12);
+                if strcmp(bestArray, 'op1')
+                    app.fLabel.Text = dec2bin(1,2);
+                elseif strcmp(bestArray, 'op2')
+                    app.fLabel.Text = dec2bin(2,2);
+                elseif strcmp(bestArray, 'op3')
+                    app.fLabel.Text = dec2bin(3,2);
+                end
+            end
+            REF_CLK_DIV_SEL10DropDownValueChanged(app, event);
+        end
+
+        % Button pushed function: GeneratePatternFileButton
+        function GeneratePatternFileButtonPushed(app, event)
+            % Param names as they appear in your label mapping
+            paramNames = {
+                'PLL_CP_CURR_PROG<4:0>', ...
+                'PLL_VCO_PDAC_PROG<5:0>', ...
+                'PLL_FB_DIV<11:0>', ...
+                'PLL_VCO_NDAC_PROG<4:0>', ...
+                'PLL_VCO_NDAC_EN', ...
+                'PLL_OUT_DIV_SEL<1:0>', ...
+                'PLL_INP_DIV_SEL<1:0>', ...
+                'BG_CURR_PROG<1:0>', ...
+                'CURR_TYPE_SEL', ...
+                'PLL_INP_DIV<6:0>', ...
+                'PLL_PFD_DELAY_PROG<1:0>', ...
+                'BG_EN', ...
+                'PLL_EN', ...
+                'REF_CLK_DIV_SEL<1:0>' ...,
+                'PLL_EN1'
+                };
+            
+            % Corresponding values from labels (already in your UI)
+            paramValues = {
+                app.aLabel.Text, app.bLabel.Text, app.cLabel.Text, app.dLabel.Text, ...
+                app.eLabel.Text, app.fLabel.Text, app.gLabel.Text, app.hLabel.Text, ...
+                app.iLabel.Text, app.jLabel.Text, app.kLabel.Text, app.lLabel.Text, ...
+                app.mLabel.Text,app.nLabel.Text,app.oLabel.Text
+                };
+            
+            % Create the parameter-value mapping
+            paramMap = containers.Map(paramNames, paramValues);
+%            Select_allCheckBoxValueChanged(app, event); 
+            % Actual checkbox handles based on your screenshot
+            checkboxes = {
+                app.PLL_CP_CURR_PROGCheckBox, ...
+                app.PLL_VCO_PDAC_PROGCheckBox, ...
+                app.PLL_FB_DIVCheckBox, ...
+                app.PLL_VCO_NDAC_PROGCheckBox, ...
+                app.PLL_VCO_NDAC_ENCheckBox, ...
+                app.PLL_OUT_DIV_SELCheckBox, ...
+                app.PLL_INP_DIV_SELCheckBox, ...
+                app.BG_CURR_PROGCheckBox, ...
+                app.CURR_TYPE_SELCheckBox, ...
+                app.PLL_INP_DIVCheckBox, ...
+                app.PLL_PFD_DELAY_PROGCheckBox, ...
+                app.BG_ENCheckBox, ...
+                app.PLL_ENCheckBox, ...
+                app.REF_CLK_DIV_SELCheckBox, ...
+                app.PLL_EN1CheckBox
+                };
+            
+            
+            
+            
+            % Final output arrays
+            selectedLabels = {};
+            selectedValues = {};
+            
+            % Loop through each checkbox and collect if selected
+            for i = 1:length(checkboxes)
+                if checkboxes{i}.Value 
+                    selectedLabels{end+1} = paramNames{i};
+                    selectedValues{end+1} = paramMap(paramNames{i});
+                end
+            end
+            prompt = {'Enter Your Pattern Name'};
+            dlgtitle = 'Pattern Name';
+            dims = [1 35];
+            definput = {''};
+            answert = inputdlg(prompt,dlgtitle,dims,definput);
+            
+            numUsed = length(selectedLabels);
+            selectedTester = app.Select_TesterDropDown.Value;
+            if strcmp(selectedTester,'PXIe')
+                disp('PXIe selected');
+                % File dialog
+                [file, path] = uiputfile('*.digipatsrc', 'Save Selected Label Values');
+                if isequal(file, 0) || isequal(path, 0)
+                    return;
+                end
+                fullFileName = fullfile(path, file);
+                fid = fopen(fullFileName, 'w');
+                if fid == -1
+                    uialert(app.UIFigure, 'Cannot open file for writing.', 'File Error');
+                    return;
+                end
+                % Write label-value pairs
+%                  for i = 1:numUsed
+%                      fprintf(fid, '%s: %s\r\n', selectedLabels{i}, selectedValues{i});
+%                  end
+                % Add fixed structure
+                fprintf(fid, '\r\nfile_format_version 1.1;\r\n');
+                fprintf(fid, 'timeset tset_name;\r\n\r\n');
+                fprintf(fid,'pattern ');
+                fprintf(fid,'%s',answert{1},'(');
+                % Generate signal lis
+                signalList = {};
+                for i = 1:numUsed
+                    label = selectedLabels{i};
+                    % Check if bit range is present
+                    bracketIdx = regexp(label, '<\d+:\d+>', 'once');
+                    if isempty(bracketIdx)
+                        signalList{end+1} = [label]; % default 1-bit
+                    else
+                        % Extract base name and bit range
+                        baseName = extractBefore(label, bracketIdx);
+                        rangeStr = regexp(label, '<(\d+):(\d+)>', 'tokens', 'once');
+                        msb = str2double(rangeStr{1});
+                        lsb = str2double(rangeStr{2});
+                        for b = msb:-1:lsb
+                            signalList{end+1} = sprintf('%s%s%d', baseName,'_', b);
+                        end
+                    end
+                end
+                % Write comma-separated signal list
+                fprintf(fid, '%s', strjoin(signalList, ', '));
+                fprintf(fid,')\r\n{\r\n');
+                fprintf(fid,'                tset_name     ');
+                %dosomething
+                % Prepare bit values aligned with signalList
+                bitStrings = {};  % final list of individual bit strings
+                for i = 1:numUsed
+                    label = selectedLabels{i};
+                    valueStr = selectedValues{i};
+                    value = bin2dec(valueStr);
+                    % Extract base name and bit width
+                    bracketIdx = regexp(label, '<\d+:\d+>', 'once');
+                    if isempty(bracketIdx)
+                        bitWidth = 1;
+                    else
+                        rangeStr = regexp(label, '<(\d+):(\d+)>', 'tokens', 'once');
+                        msb = str2double(rangeStr{1});
+                        lsb = str2double(rangeStr{2});
+                        bitWidth = msb - lsb + 1;
+                    end
+                    % Convert value to binary string of desired width (MSB to LSB)
+                    binStr = dec2bin(value, bitWidth);
+                    % Add each bit (MSB to LSB) to the bitStrings list
+                    for j = 1:bitWidth
+                        bitStrings{end+1} = binStr(j);
+                    end
+                end
+                % Write the bits in a line after 'tsets     '
+                for i = 1:numel(bitStrings)
+                    fprintf(fid, '%s', bitStrings{i});
+                    if i < numel(bitStrings)
+                        fprintf(fid, '\t\t');
+                    end
+                end
+                fprintf(fid,';\r\n');
+                fprintf(fid,'                tset_name     ');
+                for i = 1:numel(bitStrings)
+                    fprintf(fid, '%s', bitStrings{i});
+                    if i < numel(bitStrings)
+                        fprintf(fid, '\t\t');
+                    end
+                end
+                fprintf(fid,';\r\n');
+                fprintf(fid,'                tset_name     ');
+                for i = 1:numel(bitStrings)
+                    fprintf(fid, '%s', bitStrings{i});
+                    if i < numel(bitStrings)
+                        fprintf(fid, '\t\t');
+                    end
+                end
+                fprintf(fid,';\r\n}');
+            elseif strcmp(selectedTester, 'Advanced Tester')
+                disp('Advanced Tester selected');
+                % File dialog
+                [file, path] = uiputfile('*.txt', 'Save Selected Label Values');
+                if isequal(file, 0) || isequal(path, 0)
+                    return;
+                end
+                fullFileName = fullfile(path, file);
+                 fid = fopen(fullFileName, 'w');
+                if fid == -1
+                    uialert(app.UIFigure, 'Cannot open file for writing.', 'File Error');
+                    return;
+                end
+                % Write label-value pairs
+                %               for i = 1:numUsed
+                %                  fprintf(fid, '%s: %s\r\n', selectedLabels{i}, selectedValues{i});
+                %               end
+                % Add fixed structure
+                fprintf(fid, 'FORMAT\t');
+                %                 fprintf(fid, 'timeset Timing;\r\n\r\n');
+                %                 fprintf(fid, 'pattern ICP(  ');
+                % Generate signal list
+                signalList = {};
+                for i = 1:numUsed
+                    label = selectedLabels{i};
+                    % Check if bit range is present
+                    bracketIdx = regexp(label, '<\d+:\d+>', 'once');
+                    if isempty(bracketIdx)
+                        signalList{end+1} = [label]; % default 1-bit
+                    else
+                        % Extract base name and bit range
+                        baseName = extractBefore(label, bracketIdx);
+                        rangeStr = regexp(label, '<(\d+):(\d+)>', 'tokens', 'once');
+                        msb = str2double(rangeStr{1});
+                        lsb = str2double(rangeStr{2});
+                        for b = msb:-1:lsb
+                            signalList{end+1} = sprintf('%s%s%d', baseName,'_', b);
+                        end
+                    end
+                end
+                % Write space-separated signal list
+                fprintf(fid, '%s', strjoin(signalList,' '));
+                fprintf(fid,';\r\n');
+                fprintf(fid,'\t\tR1  std  ');
+                %dosomething
+                % Prepare bit values aligned with signalList
+                bitStrings = {};  % final list of individual bit strings
+                for i = 1:numUsed
+                    label = selectedLabels{i};
+                    valueStr = selectedValues{i};
+                    value = bin2dec(valueStr);
+                    % Extract base name and bit width
+                    bracketIdx = regexp(label, '<\d+:\d+>', 'once');
+                    if isempty(bracketIdx)
+                        bitWidth = 1;
+                    else
+                        rangeStr = regexp(label, '<(\d+):(\d+)>', 'tokens', 'once');
+                        msb = str2double(rangeStr{1});
+                        lsb = str2double(rangeStr{2});
+                        bitWidth = msb - lsb + 1;
+                    end
+                    % Convert value to binary string of desired width (MSB to LSB)
+                    binStr = dec2bin(value, bitWidth);
+                    % Add each bit (MSB to LSB) to the bitStrings list
+                    for j = 1:bitWidth
+                        bitStrings{end+1} = binStr(j);
+                    end
+                end
+                % Write the bits in a line after 'Timing     '
+                for i = 1:numel(bitStrings)
+                    fprintf(fid, '%s', bitStrings{i});
+                    if i < numel(bitStrings)
+                        fprintf(fid, ' ');
+                    end
+                end
+                fprintf(fid,';');
+                fprintf(fid,'\r\n');
+                fprintf(fid,'\t\tR1  std  ');
+                for i = 1:numel(bitStrings)
+                    fprintf(fid, '%s', bitStrings{i});
+                    if i < numel(bitStrings)
+                        fprintf(fid, ' ');
+                    end
+                end
+                fprintf(fid,';');
+            end
+            
+            
+            
+            fclose(fid);
+        end
+
+        % Button pushed function: ToExcelButton
+        function ToExcelButtonPushed(app, event)
+            % Define signal names
+            signalNames = {
+                'PLL_CP_CURR_PROG<4:0>', ...
+                'PLL_VCO_PDAC_PROG<5:0>', ...
+                'PLL_FB_DIV<11:0>', ...
+                'PLL_VCO_NDAC_PROG<4:0>', ...
+                'PLL_VCO_NDAC_EN', ...
+                'PLL_OUT_DIV_SEL<1:0>', ...
+                'PLL_INP_DIV_SEL<1:0>', ...
+                'BG_CURR_PROG<1:0>', ...
+                'CURR_TYPE_SEL', ...
+                'PLL_INP_DIV<6:0>', ...
+                'PLL_PFD_DELAY_PROG<1:0>', ...
+                'BG_EN', ...
+                'PLL_EN', ...
+                'REF_CLK_DIV_SEL', ...
+                'PLL_EN1'};
+            
+            % Get binary strings from app labels (in order)
+            bitStrings = {
+                app.aLabel.Text;   % PLL_CP_CURR_PROG<4:0>
+                app.bLabel.Text;   % PLL_VCO_PDAC_PROG<5:0>
+                app.cLabel.Text;   % PLL_FB_DIV<11:0>
+                app.dLabel.Text;   % PLL_VCO_NDAC_PROG<4:0>
+                app.eLabel.Text;   % PLL_VCO_NDAC_EN
+                app.fLabel.Text;   % PLL_OUT_DIV_SEL<1:0>
+                app.gLabel.Text;   % PLL_INP_DIV_SEL<1:0>
+                app.hLabel.Text;   % BG_CURR_PROG<1:0>
+                app.iLabel.Text;   % CURR_TYPE_SEL
+                app.jLabel.Text;   % PLL_INP_DIV<6:0>
+                app.kLabel.Text;   % PLL_PFD_DELAY_PROG<1:0>
+                app.lLabel.Text;   % BG_EN
+                app.mLabel.Text;    % PLL_EN
+                app.nLabel.Text;
+                app.oLabel.Text
+                };
+            bitStrings2 = {
+                dec2bin(bin2dec(app.aLabel.Text), 12);   % PLL_CP_CURR_PROG<4:0>
+                dec2bin(bin2dec(app.bLabel.Text), 12);   % PLL_VCO_PDAC_PROG<5:0>
+                dec2bin(bin2dec(app.cLabel.Text), 12);   % PLL_FB_DIV<11:0>
+                dec2bin(bin2dec(app.dLabel.Text), 12);   % PLL_VCO_NDAC_PROG<4:0>
+                dec2bin(bin2dec(app.eLabel.Text), 12);   % PLL_VCO_NDAC_EN
+                dec2bin(bin2dec(app.fLabel.Text), 12);   % PLL_OUT_DIV_SEL<1:0>
+                dec2bin(bin2dec(app.gLabel.Text), 12);   % PLL_INP_DIV_SEL<1:0>
+                dec2bin(bin2dec(app.hLabel.Text), 12);   % BG_CURR_PROG<1:0>
+                dec2bin(bin2dec(app.iLabel.Text), 12);   % CURR_TYPE_SEL
+                dec2bin(bin2dec(app.jLabel.Text), 12);   % PLL_INP_DIV<6:0>
+                dec2bin(bin2dec(app.kLabel.Text), 12);   % PLL_PFD_DELAY_PROG<1:0>
+                dec2bin(bin2dec(app.lLabel.Text), 12);   % BG_EN
+                dec2bin(bin2dec(app.mLabel.Text), 12);    % PLL_EN
+                dec2bin(bin2dec(app.nLabel.Text), 12);
+                dec2bin(bin2dec(app.oLabel.Text), 12);
+                };
+            
+            % Compute max number of bits
+            maxBits = 12
+            
+            % Create header: Bit 0 = MSB, Bit N = LSB
+            header = [{'Signal Name'}, arrayfun(@(i) sprintf('Bit %d', i-1), maxBits:-1:1, 'UniformOutput', false)];
+            
+            % Initialize data cell array
+            data = cell(length(signalNames), maxBits + 1);
+            
+            % Fill the data
+            for i = 1:length(signalNames)
+                data{i,1} = signalNames{i};
+                binStr = bitStrings2{i};
+                % Reverse string: MSB to LSB
+                binStr = binStr(:)';              % Ensure row
+                revStr = binStr;                  % MSB to LSB is original order
+                for j = 1:length(revStr)
+                    data{i, j+1} = revStr(j);
+                end
+            end
+            
+            % Combine header and data
+            outputCell = [header; data];
+            
+            % Write to Excel using xlswrite (compatible with MATLAB 2017b)
+            filename = 'pll_config_bits.xlsx';
+            xlswrite(filename, outputCell);
+            
+            
+           
+        end
+
+        % Value changed function: REF_CLK_DIV_SEL10DropDown
+        function REF_CLK_DIV_SEL10DropDownValueChanged(app, event)
+            value = app.REF_CLK_DIV_SEL10DropDown.Value;
+            switch value
+                case 'Divide By 1'
+                    app.nLabel.Text = '00';
+                case 'Divide By 2'
+                    app.nLabel.Text = '01';
+                case 'Divide By 4'
+                    app.nLabel.Text = '10';
+                case 'Divide By 8'
+                    app.nLabel.Text = '11';
+            end
+            
+        end
+
+        % Value changed function: Select_allCheckBox
+        function Select_allCheckBoxValueChanged(app, event)
+            value = app.Select_allCheckBox.Value;
+            
+             app.PLL_CP_CURR_PROGCheckBox.Value = value;
+                app.PLL_VCO_PDAC_PROGCheckBox.Value = value;
+                app.PLL_FB_DIVCheckBox.Value = value;
+                app.PLL_VCO_NDAC_PROGCheckBox.Value = value;
+                app.PLL_VCO_NDAC_ENCheckBox.Value = value;
+                app.PLL_OUT_DIV_SELCheckBox.Value = value;
+                app.PLL_INP_DIV_SELCheckBox.Value = value;
+                app.BG_CURR_PROGCheckBox.Value = value;
+                app.CURR_TYPE_SELCheckBox.Value = value;
+                app.PLL_INP_DIVCheckBox.Value = value;
+                app.PLL_PFD_DELAY_PROGCheckBox.Value = value;
+                app.BG_ENCheckBox.Value = value;
+                app.PLL_ENCheckBox.Value = value;
+                app.REF_CLK_DIV_SELCheckBox.Value = value;
+                app.PLL_EN1CheckBox.Value = value;
+        end
+    end
+
+    % App initialization and construction
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure
+            app.UIFigure = uifigure;
+            app.UIFigure.Color = [1 1 1];
+            app.UIFigure.Position = [100 100 766 495];
+            app.UIFigure.Name = 'UI Figure';
+
+            % Create Menu
+            app.Menu = uimenu(app.UIFigure);
+            app.Menu.Text = 'Menu';
+
+            % Create Menu2
+            app.Menu2 = uimenu(app.UIFigure);
+            app.Menu2.Text = 'Menu2';
+
+            % Create TabGroup
+            app.TabGroup = uitabgroup(app.UIFigure);
+            app.TabGroup.Position = [15 16 356 462];
+
+            % Create ConfigurePinsTab
+            app.ConfigurePinsTab = uitab(app.TabGroup);
+            app.ConfigurePinsTab.Title = 'Configure Pins';
+            app.ConfigurePinsTab.BackgroundColor = [0.502 0.749 0.9294];
+
+            % Create FINDSETTINGSButton
+            app.FINDSETTINGSButton = uibutton(app.ConfigurePinsTab, 'push');
+            app.FINDSETTINGSButton.ButtonPushedFcn = createCallbackFcn(app, @FINDSETTINGSButtonPushed, true);
+            app.FINDSETTINGSButton.BackgroundColor = [0.9412 0.9412 0.9412];
+            app.FINDSETTINGSButton.Position = [76 5 105 26];
+            app.FINDSETTINGSButton.Text = 'FIND SETTINGS';
+
+            % Create outputEditFieldLabel
+            app.outputEditFieldLabel = uilabel(app.ConfigurePinsTab);
+            app.outputEditFieldLabel.HorizontalAlignment = 'right';
+            app.outputEditFieldLabel.FontWeight = 'bold';
+            app.outputEditFieldLabel.Position = [55 223 41 15];
+            app.outputEditFieldLabel.Text = 'output';
+
+            % Create outputEditField
+            app.outputEditField = uieditfield(app.ConfigurePinsTab, 'numeric');
+            app.outputEditField.FontWeight = 'bold';
+            app.outputEditField.Position = [111 219 191 22];
+
+            % Create clkEditFieldLabel
+            app.clkEditFieldLabel = uilabel(app.ConfigurePinsTab);
+            app.clkEditFieldLabel.HorizontalAlignment = 'right';
+            app.clkEditFieldLabel.FontWeight = 'bold';
+            app.clkEditFieldLabel.Position = [52 411 25 15];
+            app.clkEditFieldLabel.Text = 'clk';
+
+            % Create clkEditField
+            app.clkEditField = uieditfield(app.ConfigurePinsTab, 'numeric');
+            app.clkEditField.FontWeight = 'bold';
+            app.clkEditField.Position = [106 407 193 22];
+
+            % Create ToExcelButton
+            app.ToExcelButton = uibutton(app.ConfigurePinsTab, 'push');
+            app.ToExcelButton.ButtonPushedFcn = createCallbackFcn(app, @ToExcelButtonPushed, true);
+            app.ToExcelButton.BackgroundColor = [0.9412 0.9412 0.9412];
+            app.ToExcelButton.Position = [196 7 103 23];
+            app.ToExcelButton.Text = 'ToExcel';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.ConfigurePinsTab);
+            title(app.UIAxes, 'Title')
+            xlabel(app.UIAxes, 'X')
+            ylabel(app.UIAxes, 'Y')
+            app.UIAxes.Position = [26 253 300 151];
+
+            % Create UIAxes2
+            app.UIAxes2 = uiaxes(app.ConfigurePinsTab);
+            title(app.UIAxes2, 'Title')
+            xlabel(app.UIAxes2, 'X')
+            ylabel(app.UIAxes2, 'Y')
+            app.UIAxes2.Position = [26 50 311 163];
+
+            % Create MHzLabel
+            app.MHzLabel = uilabel(app.ConfigurePinsTab);
+            app.MHzLabel.Position = [307 410 30 15];
+            app.MHzLabel.Text = 'MHz';
+
+            % Create MHzLabel_2
+            app.MHzLabel_2 = uilabel(app.ConfigurePinsTab);
+            app.MHzLabel_2.Position = [307 219 30 15];
+            app.MHzLabel_2.Text = 'MHz';
+
+            % Create SelectPinNamesTab
+            app.SelectPinNamesTab = uitab(app.TabGroup);
+            app.SelectPinNamesTab.Title = 'Select Pin Names';
+            app.SelectPinNamesTab.BackgroundColor = [0.502 0.749 0.9216];
+
+            % Create GeneratePatternFileButton
+            app.GeneratePatternFileButton = uibutton(app.SelectPinNamesTab, 'push');
+            app.GeneratePatternFileButton.ButtonPushedFcn = createCallbackFcn(app, @GeneratePatternFileButtonPushed, true);
+            app.GeneratePatternFileButton.Position = [98 64 131 22];
+            app.GeneratePatternFileButton.Text = 'Generate Pattern File';
+
+            % Create PLL_ENCheckBox
+            app.PLL_ENCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_ENCheckBox.Text = 'PLL_EN';
+            app.PLL_ENCheckBox.FontWeight = 'bold';
+            app.PLL_ENCheckBox.Position = [4 406 68 15];
+
+            % Create BG_ENCheckBox
+            app.BG_ENCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.BG_ENCheckBox.Text = 'BG_EN';
+            app.BG_ENCheckBox.FontWeight = 'bold';
+            app.BG_ENCheckBox.Position = [5 388 64 15];
+
+            % Create PLL_PFD_DELAY_PROGCheckBox
+            app.PLL_PFD_DELAY_PROGCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_PFD_DELAY_PROGCheckBox.Text = 'PLL_PFD_DELAY_PROG';
+            app.PLL_PFD_DELAY_PROGCheckBox.FontWeight = 'bold';
+            app.PLL_PFD_DELAY_PROGCheckBox.Position = [5 369 195 15];
+
+            % Create PLL_INP_DIVCheckBox
+            app.PLL_INP_DIVCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_INP_DIVCheckBox.Text = 'PLL_INP_DIV';
+            app.PLL_INP_DIVCheckBox.FontWeight = 'bold';
+            app.PLL_INP_DIVCheckBox.Position = [4 346 98 15];
+
+            % Create CURR_TYPE_SELCheckBox
+            app.CURR_TYPE_SELCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.CURR_TYPE_SELCheckBox.Text = 'CURR_TYPE_SEL';
+            app.CURR_TYPE_SELCheckBox.FontWeight = 'bold';
+            app.CURR_TYPE_SELCheckBox.Position = [5 322 126 15];
+
+            % Create BG_CURR_PROGCheckBox
+            app.BG_CURR_PROGCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.BG_CURR_PROGCheckBox.Text = 'BG_CURR_PROG';
+            app.BG_CURR_PROGCheckBox.FontWeight = 'bold';
+            app.BG_CURR_PROGCheckBox.Position = [5 297 125 15];
+
+            % Create PLL_INP_DIV_SELCheckBox
+            app.PLL_INP_DIV_SELCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_INP_DIV_SELCheckBox.Text = 'PLL_INP_DIV_SEL';
+            app.PLL_INP_DIV_SELCheckBox.FontWeight = 'bold';
+            app.PLL_INP_DIV_SELCheckBox.Position = [4 274 128 15];
+
+            % Create PLL_OUT_DIV_SELCheckBox
+            app.PLL_OUT_DIV_SELCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_OUT_DIV_SELCheckBox.Text = 'PLL_OUT_DIV_SEL';
+            app.PLL_OUT_DIV_SELCheckBox.FontWeight = 'bold';
+            app.PLL_OUT_DIV_SELCheckBox.Position = [5 253 133 15];
+
+            % Create PLL_FB_DIVCheckBox
+            app.PLL_FB_DIVCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_FB_DIVCheckBox.Text = 'PLL_FB_DIV';
+            app.PLL_FB_DIVCheckBox.FontWeight = 'bold';
+            app.PLL_FB_DIVCheckBox.Position = [5 230 130 15];
+
+            % Create PLL_VCO_NDAC_PROGCheckBox
+            app.PLL_VCO_NDAC_PROGCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_VCO_NDAC_PROGCheckBox.Text = 'PLL_VCO_NDAC_PROG';
+            app.PLL_VCO_NDAC_PROGCheckBox.FontWeight = 'bold';
+            app.PLL_VCO_NDAC_PROGCheckBox.Position = [5 207 162 15];
+
+            % Create PLL_VCO_PDAC_PROGCheckBox
+            app.PLL_VCO_PDAC_PROGCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_VCO_PDAC_PROGCheckBox.Text = 'PLL_VCO_PDAC_PROG';
+            app.PLL_VCO_PDAC_PROGCheckBox.FontWeight = 'bold';
+            app.PLL_VCO_PDAC_PROGCheckBox.Position = [5 183 161 15];
+
+            % Create PLL_VCO_NDAC_ENCheckBox
+            app.PLL_VCO_NDAC_ENCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_VCO_NDAC_ENCheckBox.Text = 'PLL_VCO_NDAC_EN';
+            app.PLL_VCO_NDAC_ENCheckBox.FontWeight = 'bold';
+            app.PLL_VCO_NDAC_ENCheckBox.Position = [4 160 144 15];
+
+            % Create PLL_CP_CURR_PROGCheckBox
+            app.PLL_CP_CURR_PROGCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_CP_CURR_PROGCheckBox.Text = 'PLL_CP_CURR_PROG';
+            app.PLL_CP_CURR_PROGCheckBox.FontWeight = 'bold';
+            app.PLL_CP_CURR_PROGCheckBox.Position = [5 135 153 15];
+
+            % Create Select_allCheckBox
+            app.Select_allCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.Select_allCheckBox.ValueChangedFcn = createCallbackFcn(app, @Select_allCheckBoxValueChanged, true);
+            app.Select_allCheckBox.Text = 'Select_all';
+            app.Select_allCheckBox.FontSize = 16;
+            app.Select_allCheckBox.FontWeight = 'bold';
+            app.Select_allCheckBox.Position = [228 411 96 20];
+
+            % Create REF_CLK_DIV_SELCheckBox
+            app.REF_CLK_DIV_SELCheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.REF_CLK_DIV_SELCheckBox.Text = 'REF_CLK_DIV_SEL';
+            app.REF_CLK_DIV_SELCheckBox.FontWeight = 'bold';
+            app.REF_CLK_DIV_SELCheckBox.Position = [5 107 135 15];
+
+            % Create PLL_EN1CheckBox
+            app.PLL_EN1CheckBox = uicheckbox(app.SelectPinNamesTab);
+            app.PLL_EN1CheckBox.Text = 'PLL_EN1';
+            app.PLL_EN1CheckBox.FontWeight = 'bold';
+            app.PLL_EN1CheckBox.Position = [4 423 75 15];
+
+            % Create PinConfigurationsPanel
+            app.PinConfigurationsPanel = uipanel(app.UIFigure);
+            app.PinConfigurationsPanel.Title = 'Pin Configurations';
+            app.PinConfigurationsPanel.BackgroundColor = [0.8 0.8 0.8];
+            app.PinConfigurationsPanel.FontAngle = 'italic';
+            app.PinConfigurationsPanel.FontWeight = 'bold';
+            app.PinConfigurationsPanel.FontSize = 22;
+            app.PinConfigurationsPanel.Position = [380 16 372 462];
+
+            % Create PLL_CP_CURR_PROG40Label
+            app.PLL_CP_CURR_PROG40Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_CP_CURR_PROG40Label.FontWeight = 'bold';
+            app.PLL_CP_CURR_PROG40Label.Position = [7 396 179 24];
+            app.PLL_CP_CURR_PROG40Label.Text = 'PLL_CP_CURR_PROG<4:0>';
+
+            % Create PLL_VCO_PDAC_PROG50Label
+            app.PLL_VCO_PDAC_PROG50Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_VCO_PDAC_PROG50Label.FontWeight = 'bold';
+            app.PLL_VCO_PDAC_PROG50Label.Position = [7 370 179 24];
+            app.PLL_VCO_PDAC_PROG50Label.Text = 'PLL_VCO_PDAC_PROG<5:0>';
+
+            % Create PLL_FB_DIV110Label
+            app.PLL_FB_DIV110Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_FB_DIV110Label.FontWeight = 'bold';
+            app.PLL_FB_DIV110Label.Position = [6 346 186 24];
+            app.PLL_FB_DIV110Label.Text = 'PLL_FB_DIV<11:0>';
+
+            % Create PLL_VCO_NDAC_PROG40Label
+            app.PLL_VCO_NDAC_PROG40Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_VCO_NDAC_PROG40Label.FontWeight = 'bold';
+            app.PLL_VCO_NDAC_PROG40Label.Position = [7 323 185 24];
+            app.PLL_VCO_NDAC_PROG40Label.Text = 'PLL_VCO_NDAC_PROG<4:0>';
+
+            % Create PLL_VCO_NDAC_ENLabel
+            app.PLL_VCO_NDAC_ENLabel = uilabel(app.PinConfigurationsPanel);
+            app.PLL_VCO_NDAC_ENLabel.FontWeight = 'bold';
+            app.PLL_VCO_NDAC_ENLabel.Position = [7 300 185 24];
+            app.PLL_VCO_NDAC_ENLabel.Text = 'PLL_VCO_NDAC_EN';
+
+            % Create PLL_OUT_DIV_SEL10Label
+            app.PLL_OUT_DIV_SEL10Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_OUT_DIV_SEL10Label.FontWeight = 'bold';
+            app.PLL_OUT_DIV_SEL10Label.Position = [7 275 185 24];
+            app.PLL_OUT_DIV_SEL10Label.Text = 'PLL_OUT_DIV_SEL<1:0>';
+
+            % Create PLL_INP_DIV_SEL10Label
+            app.PLL_INP_DIV_SEL10Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_INP_DIV_SEL10Label.FontWeight = 'bold';
+            app.PLL_INP_DIV_SEL10Label.Position = [7 245 186 24];
+            app.PLL_INP_DIV_SEL10Label.Text = 'PLL_INP_DIV_SEL<1:0>';
+
+            % Create BG_CURR_PROG10Label
+            app.BG_CURR_PROG10Label = uilabel(app.PinConfigurationsPanel);
+            app.BG_CURR_PROG10Label.FontWeight = 'bold';
+            app.BG_CURR_PROG10Label.Position = [7 217 185 24];
+            app.BG_CURR_PROG10Label.Text = 'BG_CURR_PROG<1:0>';
+
+            % Create CURR_TYPE_SELLabel
+            app.CURR_TYPE_SELLabel = uilabel(app.PinConfigurationsPanel);
+            app.CURR_TYPE_SELLabel.FontWeight = 'bold';
+            app.CURR_TYPE_SELLabel.Position = [7 189 185 24];
+            app.CURR_TYPE_SELLabel.Text = 'CURR_TYPE_SEL';
+
+            % Create PLL_INP_DIV60Label
+            app.PLL_INP_DIV60Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_INP_DIV60Label.FontWeight = 'bold';
+            app.PLL_INP_DIV60Label.Position = [7 161 185 24];
+            app.PLL_INP_DIV60Label.Text = 'PLL_INP_DIV<6:0>';
+
+            % Create PLL_PFD_DELAY_PROG10Label
+            app.PLL_PFD_DELAY_PROG10Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_PFD_DELAY_PROG10Label.FontWeight = 'bold';
+            app.PLL_PFD_DELAY_PROG10Label.Position = [7 131 186 24];
+            app.PLL_PFD_DELAY_PROG10Label.Text = 'PLL_PFD_DELAY_PROG<1:0>';
+
+            % Create BG_ENLabel
+            app.BG_ENLabel = uilabel(app.PinConfigurationsPanel);
+            app.BG_ENLabel.FontWeight = 'bold';
+            app.BG_ENLabel.Position = [6 108 186 24];
+            app.BG_ENLabel.Text = 'BG_EN';
+
+            % Create PLL_ENLabel
+            app.PLL_ENLabel = uilabel(app.PinConfigurationsPanel);
+            app.PLL_ENLabel.FontWeight = 'bold';
+            app.PLL_ENLabel.Position = [6 82 186 24];
+            app.PLL_ENLabel.Text = 'PLL_EN';
+
+            % Create PLL_EN1Label
+            app.PLL_EN1Label = uilabel(app.PinConfigurationsPanel);
+            app.PLL_EN1Label.FontWeight = 'bold';
+            app.PLL_EN1Label.Position = [7 50 179 24];
+            app.PLL_EN1Label.Text = 'PLL_EN1';
+
+            % Create REF_CLK_DIV_SEL10DropDownLabel
+            app.REF_CLK_DIV_SEL10DropDownLabel = uilabel(app.PinConfigurationsPanel);
+            app.REF_CLK_DIV_SEL10DropDownLabel.HorizontalAlignment = 'right';
+            app.REF_CLK_DIV_SEL10DropDownLabel.FontWeight = 'bold';
+            app.REF_CLK_DIV_SEL10DropDownLabel.Position = [-1 36 150 15];
+            app.REF_CLK_DIV_SEL10DropDownLabel.Text = 'REF_CLK_DIV_SEL<1:0>';
+
+            % Create REF_CLK_DIV_SEL10DropDown
+            app.REF_CLK_DIV_SEL10DropDown = uidropdown(app.PinConfigurationsPanel);
+            app.REF_CLK_DIV_SEL10DropDown.Items = {'Divide By 1', 'Divide By 2', 'Divide By 4', 'Divide By 8'};
+            app.REF_CLK_DIV_SEL10DropDown.ValueChangedFcn = createCallbackFcn(app, @REF_CLK_DIV_SEL10DropDownValueChanged, true);
+            app.REF_CLK_DIV_SEL10DropDown.FontWeight = 'bold';
+            app.REF_CLK_DIV_SEL10DropDown.Position = [164 32 84 22];
+            app.REF_CLK_DIV_SEL10DropDown.Value = 'Divide By 1';
+
+            % Create Select_TesterDropDownLabel
+            app.Select_TesterDropDownLabel = uilabel(app.PinConfigurationsPanel);
+            app.Select_TesterDropDownLabel.BackgroundColor = [1 1 1];
+            app.Select_TesterDropDownLabel.HorizontalAlignment = 'right';
+            app.Select_TesterDropDownLabel.FontWeight = 'bold';
+            app.Select_TesterDropDownLabel.Position = [7 5 85 18];
+            app.Select_TesterDropDownLabel.Text = 'Select_Tester';
+
+            % Create Select_TesterDropDown
+            app.Select_TesterDropDown = uidropdown(app.PinConfigurationsPanel);
+            app.Select_TesterDropDown.Items = {'PXIe', 'Advanced Tester'};
+            app.Select_TesterDropDown.FontWeight = 'bold';
+            app.Select_TesterDropDown.BackgroundColor = [1 1 1];
+            app.Select_TesterDropDown.Position = [101 4 147 22];
+            app.Select_TesterDropDown.Value = 'PXIe';
+
+            % Create aLabel
+            app.aLabel = uilabel(app.PinConfigurationsPanel);
+            app.aLabel.Position = [264 407 106 13];
+            app.aLabel.Text = 'a';
+
+            % Create bLabel
+            app.bLabel = uilabel(app.PinConfigurationsPanel);
+            app.bLabel.Position = [265 376 106 18];
+            app.bLabel.Text = 'b';
+
+            % Create cLabel
+            app.cLabel = uilabel(app.PinConfigurationsPanel);
+            app.cLabel.Position = [265 347 106 24];
+            app.cLabel.Text = 'c';
+
+            % Create dLabel
+            app.dLabel = uilabel(app.PinConfigurationsPanel);
+            app.dLabel.Position = [265 326 106 20];
+            app.dLabel.Text = 'd';
+
+            % Create eLabel
+            app.eLabel = uilabel(app.PinConfigurationsPanel);
+            app.eLabel.Position = [264 300 106 24];
+            app.eLabel.Text = 'e';
+
+            % Create fLabel
+            app.fLabel = uilabel(app.PinConfigurationsPanel);
+            app.fLabel.Position = [265 283 106 16];
+            app.fLabel.Text = 'f';
+
+            % Create gLabel
+            app.gLabel = uilabel(app.PinConfigurationsPanel);
+            app.gLabel.Position = [265 253 106 16];
+            app.gLabel.Text = 'g';
+
+            % Create hLabel
+            app.hLabel = uilabel(app.PinConfigurationsPanel);
+            app.hLabel.Position = [265 226 106 15];
+            app.hLabel.Text = 'h';
+
+            % Create iLabel
+            app.iLabel = uilabel(app.PinConfigurationsPanel);
+            app.iLabel.Position = [266 197 106 16];
+            app.iLabel.Text = 'i';
+
+            % Create jLabel
+            app.jLabel = uilabel(app.PinConfigurationsPanel);
+            app.jLabel.Position = [265 169 106 16];
+            app.jLabel.Text = 'j';
+
+            % Create kLabel
+            app.kLabel = uilabel(app.PinConfigurationsPanel);
+            app.kLabel.Position = [265 135 106 20];
+            app.kLabel.Text = 'k';
+
+            % Create lLabel
+            app.lLabel = uilabel(app.PinConfigurationsPanel);
+            app.lLabel.Position = [265 111 106 19];
+            app.lLabel.Text = 'l';
+
+            % Create oLabel
+            app.oLabel = uilabel(app.PinConfigurationsPanel);
+            app.oLabel.Position = [265 53 106 19];
+            app.oLabel.Text = 'o';
+
+            % Create nLabel
+            app.nLabel = uilabel(app.PinConfigurationsPanel);
+            app.nLabel.Position = [265 27 106 24];
+            app.nLabel.Text = 'n';
+
+            % Create mLabel
+            app.mLabel = uilabel(app.PinConfigurationsPanel);
+            app.mLabel.Position = [264 82 107 24];
+            app.mLabel.Text = 'm';
+        end
+    end
+
+    methods (Access = public)
+
+        % Construct app
+        function app = PLL_PAT_GEN
+
+            % Create and configure components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            % Execute the startup function
+            runStartupFcn(app, @startupFcn)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
