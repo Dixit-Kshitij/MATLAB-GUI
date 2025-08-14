@@ -3,8 +3,6 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
     % Properties that correspond to app components
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
-        Menu                            matlab.ui.container.Menu
-        Menu2                           matlab.ui.container.Menu
         TabGroup                        matlab.ui.container.TabGroup
         ConfigurePinsTab                matlab.ui.container.Tab
         FINDSETTINGSButton              matlab.ui.control.Button
@@ -160,8 +158,7 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
                     end
                 end
             end
-            if output > 1 && output <= 300
-                
+            if output > 1 && output <= 300             
                 % Calculate minimum differences for each array
                 [diff1, idx1] = min(abs(op1 - output));
                 [diff2, idx2] = min(abs(op2 - output));
@@ -177,52 +174,6 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
                 arrayNames = {'op1', 'op2', 'op3', 'outputs'};
                 bestArray = arrayNames{arrayNum}; % This tells you from which array bestIdx came
                 
-                % for i = 1:length(thresholds)
-                % if output <= th3(i)
-                %     app.bLabel.Text = dec2bin(bValues(i), 6);
-                %     app.aLabel.Text = dec2bin(aValues(i), 5);
-                %     app.dLabel.Text = dec2bin(nValues(i), 5);
-                %     app.fLabel.Text = dec2bin(3, 2);
-                %
-                %     if output <= 562/8
-                %         e = 1;
-                %         app.eLabel.Text = dec2bin(e);
-                %     end
-                %
-                %     break;
-                % end
-                % if output <= th2(i)
-                %     app.bLabel.Text = dec2bin(bValues(i), 6);
-                %     app.aLabel.Text = dec2bin(aValues(i), 5);
-                %     app.dLabel.Text = dec2bin(nValues(i), 5);
-                %     app.fLabel.Text = dec2bin(2, 2);
-                %     if output <= 562/4
-                %         e = 1;
-                %         app.eLabel.Text = dec2bin(e);
-                %     end
-                %
-                %     break;
-                % end
-                % if output <= th1(i)
-                %     app.bLabel.Text = dec2bin(bValues(i), 6);
-                %     app.aLabel.Text = dec2bin(aValues(i), 5);
-                %     app.dLabel.Text = dec2bin(nValues(i), 5);
-                %     app.fLabel.Text = dec2bin(1, 2);
-                %     if output <= 562/2
-                %         e = 1;
-                %         app.eLabel.Text = dec2bin(e);
-                %     end
-                %
-                %     break;
-                % end
-                % app.bLabel.Text = dec2bin(bValues(bestIdx), 6);
-                % app.aLabel.Text = dec2bin(aValues(bestIdx), 5);
-                % app.dLabel.Text = dec2bin(nValues(bestIdx), 5);
-                % app.fLabel.Text = dec2bin(1, 2);
-                % if output(bestIdx) <= 562
-                %     e = 1;
-                %     app.eLabel.Text = dec2bin(e);
-                % end
                 if outputs(bestIdx) > 319 && outputs(bestIdx) <= 1200
                     for i = 1:length(thresholds)
                         if outputs(bestIdx) <= thresholds(i)
@@ -238,6 +189,7 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
                     end
                 end
                 app.cLabel.Text = dec2bin(outputs(bestIdx),12);
+                %For O/p Divider SEL
                 if strcmp(bestArray, 'op1')
                     app.fLabel.Text = dec2bin(1,2);
                 elseif strcmp(bestArray, 'op2')
@@ -415,8 +367,8 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
                     end
                 end
                 fprintf(fid,';\r\n}');
-            elseif strcmp(selectedTester, 'Advanced Tester')
-                disp('Advanced Tester selected');
+            elseif strcmp(selectedTester, 'Advantest')
+                disp('Advantest selected');
                 % File dialog
                 [file, path] = uiputfile('*.txt', 'Save Selected Label Values');
                 if isequal(file, 0) || isequal(path, 0)
@@ -644,14 +596,6 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
             app.UIFigure.Color = [1 1 1];
             app.UIFigure.Position = [100 100 766 495];
             app.UIFigure.Name = 'UI Figure';
-
-            % Create Menu
-            app.Menu = uimenu(app.UIFigure);
-            app.Menu.Text = 'Menu';
-
-            % Create Menu2
-            app.Menu2 = uimenu(app.UIFigure);
-            app.Menu2.Text = 'Menu2';
 
             % Create TabGroup
             app.TabGroup = uitabgroup(app.UIFigure);
@@ -951,7 +895,7 @@ classdef PLL_PAT_GEN < matlab.apps.AppBase
 
             % Create Select_TesterDropDown
             app.Select_TesterDropDown = uidropdown(app.PinConfigurationsPanel);
-            app.Select_TesterDropDown.Items = {'PXIe', 'Advanced Tester'};
+            app.Select_TesterDropDown.Items = {'PXIe', 'Advantest'};
             app.Select_TesterDropDown.FontWeight = 'bold';
             app.Select_TesterDropDown.BackgroundColor = [1 1 1];
             app.Select_TesterDropDown.Position = [101 4 147 22];
